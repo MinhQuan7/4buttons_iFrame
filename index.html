@@ -13,34 +13,36 @@
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
           sans-serif;
         height: 300px;
+        max-height: 300px;
+        overflow: hidden;
       }
 
       .switch-container {
-        display: flex;
-        flex-direction: column;
-        gap: 20px;
-        padding: 20px;
-        overflow-y: auto; /* Enable scrolling */
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        padding: 8px;
         width: 100%;
         box-sizing: border-box;
+        max-height: 300px;
       }
 
       .switch-wrapper {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 6px;
         background: white;
-        padding: 15px;
-        border-radius: 8px;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        padding: 8px;
+        border-radius: 6px;
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
       }
 
       .switch {
         position: relative;
-        width: 51px;
-        height: 31px;
+        width: 40px;
+        height: 24px;
         background: #e9e9ea;
-        border-radius: 31px;
+        border-radius: 24px;
         transition: background-color 0.2s;
         cursor: pointer;
         flex-shrink: 0;
@@ -53,28 +55,28 @@
       .switch::before {
         content: "";
         position: absolute;
-        width: 27px;
-        height: 27px;
+        width: 20px;
+        height: 20px;
         border-radius: 50%;
         top: 2px;
         left: 2px;
         background: white;
-        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
         transition: transform 0.2s;
       }
 
       .switch.active::before {
-        transform: translateX(20px);
+        transform: translateX(16px);
       }
 
       .label {
-        font-size: 17px;
+        font-size: 13px;
         color: #333;
         flex-grow: 1;
       }
 
       .status {
-        font-size: 14px;
+        font-size: 12px;
         color: #666;
       }
     </style>
@@ -112,7 +114,6 @@
         onToilet = null,
         offToilet = null;
 
-      // Định nghĩa các nút điều khiển cho từng đèn
       const devices = {
         1: { name: "bedroom", action: null, actionOff: null },
         2: { name: "kitchen", actionOn: null, actionOff: null },
@@ -122,7 +123,6 @@
 
       eraWidget.init({
         onConfiguration: (configuration) => {
-          // Lưu trữ các action từ cấu hình
           onBedLight = configuration.actions[0];
           offBedLight = configuration.actions[1];
           onKitchenLight = configuration.actions[2];
@@ -131,7 +131,7 @@
           offLivingLight = configuration.actions[5];
           onToilet = configuration.actions[6];
           offToilet = configuration.actions[7];
-          // Gán các action cho thiết bị tương ứng
+
           devices[1].action = onBedLight;
           devices[1].actionOff = offBedLight;
           devices[2].actionOn = onKitchenLight;
