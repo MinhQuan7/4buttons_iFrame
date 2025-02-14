@@ -9,11 +9,10 @@
         display: flex;
         flex-direction: column;
         align-items: center;
-        justify-content: center;
-        height: 300px;
         background: #f5f5f5;
         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
           sans-serif;
+        height: 100vh; /* Full viewport height */
       }
 
       .switch-container {
@@ -21,12 +20,20 @@
         flex-direction: column;
         gap: 20px;
         padding: 20px;
+        max-height: calc(100vh - 40px); /* Subtract padding */
+        overflow-y: auto; /* Enable scrolling */
+        width: 100%;
+        box-sizing: border-box;
       }
 
       .switch-wrapper {
         display: flex;
         align-items: center;
         gap: 10px;
+        background: white;
+        padding: 15px;
+        border-radius: 8px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
       }
 
       .switch {
@@ -37,6 +44,7 @@
         border-radius: 31px;
         transition: background-color 0.2s;
         cursor: pointer;
+        flex-shrink: 0;
       }
 
       .switch.active {
@@ -63,7 +71,7 @@
       .label {
         font-size: 17px;
         color: #333;
-        min-width: 120px;
+        flex-grow: 1;
       }
 
       .status {
@@ -95,6 +103,7 @@
     <script>
       // Khởi tạo ERA Widget
       const eraWidget = new EraWidget();
+      eraWidget.requestAdjustMobileHeight(300);
       let onBedLight = null,
         offBedLight = null,
         onKitchenLight = null,
@@ -125,13 +134,13 @@
           offToilet = configuration.actions[7];
           // Gán các action cho thiết bị tương ứng
           devices[1].action = onBedLight;
-          devices[1].action = offBedLight;
+          devices[1].actionOff = offBedLight;
           devices[2].actionOn = onKitchenLight;
           devices[2].actionOff = offKitchenLight;
           devices[3].action = onLivingLight;
-          devices[3].action = offLivingLight;
+          devices[3].actionOff = offLivingLight;
           devices[4].action = onToilet;
-          devices[4].action = offToilet;
+          devices[4].actionOff = offToilet;
 
           console.log("ERA Widget đã được khởi tạo thành công");
         },
@@ -150,10 +159,14 @@
             console.log(
               `${isActive ? "Bật" : "Tắt"} ${devices[lightNumber].name}`
             );
+          } else if (devices[lightNumber].actionOff) {
+            eraWidget.triggerAction(
+              devices[lightNumber].actionOff.action,
+              null
+            );
           }
         } catch (error) {
           console.error(`Lỗi điều khiển thiết bị ${lightNumber}:`, error);
-          // Hoàn tác trạng thái switch nếu có lỗi
           switchElement.classList.toggle("active");
         }
       }
