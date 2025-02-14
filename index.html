@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <script src="https://www.unpkg.com/@eohjsc/era-widget@1.1.3/src/index.js"></script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script src="https://www.unpkg.com/@eohjsc/era-widget@1.1.3/src/index.js"></script>
     <style>
       body {
         margin: 0;
@@ -35,7 +35,7 @@
         height: 31px;
         background: #e9e9ea;
         border-radius: 31px;
-        transition: background-color 0.1s;
+        transition: background-color 0.2s;
         cursor: pointer;
       }
 
@@ -53,7 +53,7 @@
         left: 2px;
         background: white;
         box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-        transition: transform 0.1s;
+        transition: transform 0.2s;
       }
 
       .switch.active::before {
@@ -76,50 +76,87 @@
     <div class="switch-container">
       <div class="switch-wrapper">
         <div class="switch" id="switch1" onclick="toggleLight(1)"></div>
-        <span class="label">Đèn 1</span>
+        <span class="label">Đèn Phòng Khách</span>
       </div>
       <div class="switch-wrapper">
         <div class="switch" id="switch2" onclick="toggleLight(2)"></div>
-        <span class="label">Đèn 2</span>
+        <span class="label">Đèn Phòng Ngủ</span>
       </div>
       <div class="switch-wrapper">
         <div class="switch" id="switch3" onclick="toggleLight(3)"></div>
-        <span class="label">Đèn 3</span>
+        <span class="label">Đèn Nhà Bếp</span>
       </div>
       <div class="switch-wrapper">
         <div class="switch" id="switch4" onclick="toggleLight(4)"></div>
-        <span class="label">Đèn4</span>
+        <span class="label">Đèn Phòng Toilet</span>
       </div>
     </div>
 
     <script>
-      eraWidget.requestAdjustMobileHeight(300);
-      function toggleLight(lightNumber) {
-        const switchElement = document.getElementById(`switch${lightNumber}`);
-        const statusElement = document.getElementById(`status${lightNumber}`);
-        const isActive = switchElement.classList.toggle("active");
-        if (isActive) {
-          console.log(`Bật đèn ${lightNumber}`);
-          eraWidget.triggerAction(devices[lightNumber].actionOn.action, null);
-        } else {
-          console.log(`Tắt đèn ${lightNumber}`);
-          eraWidget.triggerAction(devices[lightNumber].actionOff.action, null);
-        }
-      }
+      // Khởi tạo ERA Widget
       const eraWidget = new EraWidget();
-      let configLed1 = null,
-        configLed2 = null,
-        configLed3 = null,
-        configLed4 = null;
+      let onBedLight = null,
+        offBedLight = null,
+        onKitchenLight = null,
+        offKitchenLight = null,
+        onLivingLight = null,
+        offLivingLight = null,
+        onToilet = null,
+        offToilet = null;
+
+      // Định nghĩa các nút điều khiển cho từng đèn
+      const devices = {
+        1: { name: "bedroom", action: null, actionOff: null },
+        2: { name: "kitchen", actionOn: null, actionOff: null },
+        3: { name: "livingRoom", action: null, actionOff: null },
+        4: { name: "toilet", action: null, actionOff: null },
+      };
+
       eraWidget.init({
         onConfiguration: (configuration) => {
-          configLed1 = configuration.actions[0];
-          configLed2 = configuration.actions[1];
-          configLed3 = configuration.actions[2];
-          configLed4 = configuration.actions[3];
+          // Lưu trữ các action từ cấu hình
+          onBedLight = configuration.actions[0];
+          offBedLight = configuration.actions[1];
+          onKitchenLight = configuration.actions[2];
+          offKitchenLight = configuration.actions[3];
+          onLivingLight = configuration.actions[4];
+          offLivingLight = configuration.actions[5];
+          onToilet = configuration.actions[6];
+          offToilet = configuration.actions[7];
+          // Gán các action cho thiết bị tương ứng
+          devices[1].action = onBedLight;
+          devices[1].action = offBedLight;
+          devices[2].actionOn = onKitchenLight;
+          devices[2].actionOff = offKitchenLight;
+          devices[3].action = onLivingLight;
+          devices[3].action = offLivingLight;
+          devices[4].action = onToilet;
+          devices[4].action = offToilet;
+
+          console.log("ERA Widget đã được khởi tạo thành công");
         },
-        onValues: (values) => {},
+        onValues: (values) => {
+          console.log("Nhận được giá trị mới:", values);
+        },
       });
+
+      function toggleLight(lightNumber) {
+        const switchElement = document.getElementById(`switch${lightNumber}`);
+        const isActive = switchElement.classList.toggle("active");
+
+        try {
+          if (devices[lightNumber].action) {
+            eraWidget.triggerAction(devices[lightNumber].action.action, null);
+            console.log(
+              `${isActive ? "Bật" : "Tắt"} ${devices[lightNumber].name}`
+            );
+          }
+        } catch (error) {
+          console.error(`Lỗi điều khiển thiết bị ${lightNumber}:`, error);
+          // Hoàn tác trạng thái switch nếu có lỗi
+          switchElement.classList.toggle("active");
+        }
+      }
     </script>
   </body>
 </html>
